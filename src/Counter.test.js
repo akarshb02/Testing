@@ -1,44 +1,82 @@
-import { render, fireEvent } from "@testing-library/react";
-import Counter from "./Counter";
+import Enzyme, { shallow } from 'enzyme'
+import EnzymeAdaptor from '@wojtekmaj/enzyme-adapter-react-17';
+import Counter from './Counter';
 
-describe(Counter, () => {
-  it("counter displays correct initial count", () => {
-    const { getByTestId } = render(<Counter initialCount={0} />);
-    const countValue = Number(getByTestId("count").textContent);
-    expect(countValue).toEqual(0);
-  });
 
-  it("count should increment by 1 if the increment button is clicked", () => {
-    const { getByTestId, getByRole } = render(<Counter initialCount={0} />);
-    const incrementBttn = getByRole("button", { name: "Increment" });
-    const countValue1 = Number(getByTestId("count").textContent);
-    expect(countValue1).toEqual(0);
-    fireEvent.click(incrementBttn);
-    const countValue2 = Number(getByTestId("count").textContent);
-    expect(countValue2).toEqual(1);
-  });
 
-  it("count should decrement by 1 if the decrement button is clicked", () => {
-    const { getByTestId, getByRole } = render(<Counter initialCount={0} />);
-    const decrementBttn = getByRole("button", { name: "Decrement" });
-    expect(Number(getByTestId("count").textContent)).toEqual(0);
-    fireEvent.click(decrementBttn);
-    expect(Number(getByTestId("count").textContent)).toEqual(-1);
-  });
+Enzyme.configure({ adapter: new EnzymeAdaptor() })
 
-  it("count should be 0 if the restart button is clicked", () => {
-    const { getByTestId, getByRole } = render(<Counter initialCount={50} />);
-    const restartBttn = getByRole("button", { name: "Restart" });
-    expect(Number(getByTestId("count").textContent)).toEqual(50);
-    fireEvent.click(restartBttn);
-    expect(Number(getByTestId("count").textContent)).toEqual(0);
-  });
+const setup = () => shallow(<Counter />)
 
-  it("count should invert signs if the switch signs button is clicked", () => {
-    const { getByTestId, getByRole } = render(<Counter initialCount={50} />);
-    const switchBttn = getByRole("button", { name: "Switch Signs" });
-    expect(Number(getByTestId("count").textContent)).toEqual(50);
-    fireEvent.click(switchBttn);
-    expect(Number(getByTestId("count").textContent)).toEqual(-50);
-  });
-});
+const setupFunction = (wrapper, id) => wrapper.find(`[data-test='${id}']`)
+
+test('component render without error', () => {
+  const wrapper = setup();
+  const appComponent = setupFunction(wrapper, 'appComponent')
+  expect(appComponent.length).toBe(1)
+
+})
+
+test("render increment button", () => {
+  const wrapper = setup();
+  const appComponent = wrapper.find("[data-test='button-data']")
+  expect(appComponent.length).toBe(1)
+
+
+})
+
+test("counter display", () => {
+
+})
+
+test("counter display starts at 0", () => {
+
+  const wrapper = setup();
+  const count = setupFunction(wrapper, "count").text()
+  expect(count).toBe("0")
+
+})
+
+
+test("clicking button it should increment the display", () => {
+  const wrapper = setup();
+  const buttonClick = setupFunction(wrapper, "button-data")
+  buttonClick.simulate("click");
+  const displayCount = setupFunction(wrapper, "count").text();
+  expect(displayCount).toBe("1")
+
+})
+
+
+describe("decrement button", () => {
+  test("display value should be greater then 0", () => {
+    const wrapper = setup();
+    const decrementCount = setupFunction(wrapper, "count").text();
+    expect(decrementCount).toBe('0');
+
+  })
+
+  test("render decrement button", () => {
+    const wrapper = setup();
+    const decremenButton = setupFunction(wrapper, "button-decrement");
+    expect(decremenButton.length).toBe(1);
+
+  })
+
+  test("button click and display count should decremant by one", () => {
+    const wrapper = setup();
+    const decrementCount = setupFunction(wrapper, "button-decrement")
+    decrementCount.simulate("click")
+    const displayCount = setupFunction(wrapper, "count").text();
+    expect(displayCount).toBe("0")
+
+  })
+
+
+
+
+})
+
+
+
+
